@@ -1,0 +1,179 @@
+//call stack
+
+function hello(){
+    console.log("insode hello function");
+    console.log("hello");
+}
+
+function demo(){
+    console.log("calling hello function");
+    hello();
+}
+
+console.log("calling demo function");
+demo();
+console.log("done");
+
+function one(){
+    return 1;
+}
+function two(){
+    return one()+ one();
+}
+function three() {
+    let ans=two()+one();
+    console.log(ans);
+}
+three();
+
+// callback hell
+
+h1=document.querySelector("h1");
+
+function changeColor(color,delay,nextColorChange) {
+    setTimeout(()=>{
+        h1.style.color=color;
+        if (nextColorChange) nextColorChange();
+    },delay);
+}
+
+changeColor("red",1000,()=>{
+    changeColor("orange",1000,()=>{
+        changeColor("green",1000,()=>{
+            changeColor("blue",1000,()=>{
+                changeColor("yellow",1000);
+            });
+        });
+    });
+});
+//callback nesting:callback hell
+
+//to get protected from call,back hell many things are invented in js like promises,keywords like await and async
+
+//setting up for promises
+
+function savetoDB(data,success,failure){
+    let internetSpeed=Math.floor(Math.random()*10)+1;
+    if (internetSpeed>4){
+        success();
+
+    }
+    else{
+        failure();
+    }
+}
+
+//function call
+savetoDB(
+    "apna college",
+    ()=>{
+        console.log("success:your data saved succesfully");
+        savetoDB("hello world",
+            ()=>{
+                console.log("succes2:data2 was saved");
+                savetoDB("nishan",
+                    ()=>{
+                        console.log("success3:data3 saved");
+                    },
+                    ()=>{
+                        console.log("failure3:weak connection");
+                    }
+                )
+
+            },
+            ()=>{
+                console.log("failure2,weak connection");
+            }
+        )
+    },
+    ()=>{
+        console.log("failure:weak conncetion,data not saved");
+    }
+);
+//the above code is quite confusing and this is because of callback nesting also called as  
+//callback hell,so to protect or understand it effieciently there is concept called as PROMISES
+
+
+
+
+//SAME FUNCTION USING PROMISES
+
+function savetoDB(data){
+    return new Promise((resolve,reject)=>{
+        let internetSpeed=Math.floor(Math.random()*10)+1;
+    if (internetSpeed>4){
+        resolve("success:data was saved");
+    }
+    else{
+       reject("failure:weak connection")
+    }
+    });
+}
+
+//two methods of promise object namely then() and catch()
+//refering to above code only by calling it based on its result which can be either succes or failure we will perform ather task
+
+let request=savetoDB("apna college")
+request.then(()=>{
+    console.log("promise was resolved");
+    console.log(request);
+})
+.catch(()=>{
+    console.log("promise was rejected");
+    console.log(request);
+});
+
+//another compact version for the same above code
+
+
+savetoDB("apna college").then(()=>{
+    console.log("promise was resolved");
+})
+.catch(()=>{
+    console.log("promise was rejected");
+});
+
+
+//promise chaining==save us from callback hell
+
+savetoDB("nishan")
+    .then(()=>{
+        console.log("data1 saved.");
+        //if the above db got stored succesfully then only we will stored another db
+        //i.e by calling the function again
+        return savetoDB("hello world");
+    })
+    .then(()=>{
+        console.log("data2 saved.");
+        return savetoDB("Suryavanshi");
+    })
+    .then(()=>{
+            console.log("data3 saved.");
+    })
+    .catch(()=>{
+        console.log("promise was rejected");
+});
+
+//NOTE:promises are rejected and resolved with some data (the data is valid results or errors)
+
+savetoDB("nishan")
+    .then((result)=>{
+        console.log("data1 saved.");
+        console.log("result of promise:",result);
+        //if the above db got stored succesfully then only we will stored another db
+        //i.e by calling the function again
+        return savetoDB("hello world");
+    })
+    .then((result)=>{
+        console.log("data2 saved.");
+        console.log("result of promise:",result);
+        return savetoDB("Suryavanshi");
+    })
+    .then((result)=>{
+            console.log("data3 saved.");
+            console.log("result of promise:",result);
+    })
+    .catch((error)=>{
+        console.log("promise was rejected");
+        console.log("error of promise:",error);
+});
